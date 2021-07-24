@@ -1,11 +1,21 @@
 import requests
-from collections import Counter
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
 
 class Utility():
+
+	@staticmethod
+	def preprocessFilename(url):
+		idx = url.find('://')
+		filename = url[idx+3:]
+		idx = filename.find('www.')
+		if idx >=0 :
+			filename = filename[4:]
+
+		filename = filename.replace('/', '.')
+		return filename
 
 	@staticmethod
 	def readJson(filename):
@@ -22,10 +32,7 @@ class Utility():
 		for url in urlList:
 			try :
 				page = requests.get(url)
-				idx = url.find('://')
-
-				filename = url[idx+3:]
-
+				filename = Utility.preprocessFilename(url)
 				Utility.readJson(filename)
 			except Exception as err:
 				print (str(err))
@@ -57,6 +64,7 @@ class Utility():
 		foundImages = soup.find_all('img')
 		#print(foundImages)
 		#print(len(foundImages))
+		
 		Utility.storeJson(len(foundUrls), len(foundImages), filename)
 
 	@staticmethod
@@ -64,13 +72,9 @@ class Utility():
 		for url in urlList:
 			try :
 				page = requests.get(url)
-				idx = url.find('://')
-
-				filename = url[idx+3:]
-				#print (filename)
-				page_content = page.text
-				with open(filename+ '.html', 'w', encoding='utf8') as fp:
-					fp.write(page_content)
+				filename = Utility.preprocessFilename(url)
+				with open(filename + '.html', 'w', encoding='utf8') as fp:
+					fp.write(page.text)
 
 				Utility.storeMetaData(page, filename)
 			except Exception as err:
