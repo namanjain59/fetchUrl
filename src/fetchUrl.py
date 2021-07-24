@@ -1,6 +1,8 @@
 import getopt, sys
 from utility import Utility
+import os
  
+print (os.getcwd())
 argumentList = sys.argv[1:]
  
 long_options = ["metadata"]
