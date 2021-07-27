@@ -1,5 +1,5 @@
 import getopt, sys
-from utility import Utility
+from webInterface import WebInterface
 import os
  
 argumentList = sys.argv[1:]
@@ -21,8 +21,9 @@ except getopt.error as err:
 
 urlList = sys.argv[filestart:]
 #print(urlList)
+webInterface = WebInterface()
 
 if option == 1:
-	Utility.fetchWebPages(urlList)
+	webInterface.fetchWebPages(urlList)
 else :
-	Utility.fetchMetaData(urlList)
+	webInterface.fetchMetaData(urlList)

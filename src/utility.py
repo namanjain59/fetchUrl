@@ -1,9 +1,4 @@
-import requests
 from bs4 import BeautifulSoup
-import json
-from datetime import datetime
-
-
 class Utility():
 
 	@staticmethod
@@ -17,67 +12,14 @@ class Utility():
 		filename = filename.replace('/', '.')
 		return filename
 
-	@staticmethod
-	def readJson(filename):
-		with open(filename+'.txt') as json_file:
-			data = json.load(json_file)
-			print('site: ' , data['site'])
-			print('num_links: ' , data['num_links'])
-			print('images: ' , data['images'])
-			print('last_fetch: ' , data['time'])
-			print(' ')
-
-	@staticmethod
-	def fetchMetaData(urlList):
-		for url in urlList:
-			try :
-				page = requests.get(url)
-				filename = Utility.preprocessFilename(url)
-				Utility.readJson(filename)
-			except Exception as err:
-				print (str(err))
 
 
 	@staticmethod
-	def storeJson(urls, images, filename):
-		data = {}
-		data['site'] = filename
-		data['num_links'] = urls
-		data['images'] = images
-		date =  datetime.utcnow()
-		last_time = date.strftime("%a %b %d %Y, %H:%M:%S UTC") 
-		data['time'] = last_time
-		#print(last_time)
-		with open(filename+'.txt', 'w') as outfile:
-			json.dump(data, outfile)
-		print(filename +" fetched successfuly")
-
-
-	@staticmethod
-	def storeMetaData(page, filename):
+	def findUrls(page):
 		soup = BeautifulSoup(page.text, "html.parser")
-		foundUrls = soup.find_all("a", href=lambda href: href and not href.startswith("#"))
-		#print (foundUrls)
-		#print (len(foundUrls))
-
-		soup = BeautifulSoup(page.content, "html.parser")
-		foundImages = soup.find_all('img')
-		#print(foundImages)
-		#print(len(foundImages))
-		
-		Utility.storeJson(len(foundUrls), len(foundImages), filename)
+		return soup.find_all("a", href=lambda href: href and not href.startswith("#"))
 
 	@staticmethod
-	def fetchWebPages (urlList):
-		for url in urlList:
-			try :
-				page = requests.get(url)
-				filename = Utility.preprocessFilename(url)
-				with open(filename + '.html', 'w', encoding='utf8') as fp:
-					fp.write(page.text)
-
-				Utility.storeMetaData(page, filename)
-			except Exception as err:
-				print (str(err))
-
-
+	def findImages(page):
+		soup = BeautifulSoup(page.content, "html.parser")
+		return soup.find_all('img')
